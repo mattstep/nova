@@ -87,8 +87,8 @@ def compute_fill_first_cost_fn(host_state, weighing_properties):
 
 def weighted_sum(weighted_fns, host_states, weighing_properties):
     """Use the weighted-sum method to compute a score for an array of objects.
-    Normalize the results of the objective-functions so that the weights are
-    meaningful regardless of objective-function's range.
+    Normalize the results of the objective-functions into [0,1] so that the
+    weights are meaningful regardless of objective-function's range.
 
     host_list - [(host, HostInfo()), ...]
     weighted_fns - list of weights and functions like:
@@ -107,11 +107,18 @@ def weighted_sum(weighted_fns, host_states, weighing_properties):
         scores.append([fn(host_state, weighing_properties)
                 for host_state in host_states])
 
+    # Calculate min and max for each function's resulting scores
+    score_mins = [min(row) for row in scores]
+    score_maxes = [max(row) for row in scores]
+
     # Adjust the weights in the grid by the functions weight adjustment
-    # and sum them up to get a final list of weights.
+    # then normalize using the min/max calculated for each function
     adjusted_scores = []
-    for (weight, fn), row in zip(weighted_fns, scores):
-        adjusted_scores.append([weight * score for score in row])
+    for score_min, score_max, (weight, fn), row \
+            in zip(score_mins, score_maxes, weighted_fns, scores):
+        adjusted_scores.append(
+            [weight * float(score - score_min) / (score_max - score_min)
+                for score in row])
 
     # Now, sum down the columns to get the final score. Column per host.
     final_scores = [0.0] * len(host_states)

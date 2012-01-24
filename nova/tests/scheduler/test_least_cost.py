@@ -61,15 +61,20 @@ class LeastCostTestCase(test.TestCase):
         # [10512, 11024, 13072, 18192]
         # [1024,  2048, 6144, 16384]
 
+        # Normalized
+        # [offset, scale]=
+        # [ 0.0, 0.06667, 0.33333, 1.0]
+        # [ 0.0, 0.06667, 0.33333, 1.0]
+
         # adjusted [ 1.0 * x + 1.0 * y] =
-        # [11536, 13072, 19216, 34576]
+        # [0.0, 0.13333, 0.66667, 2.0]
 
         # so, host1 should win:
         options = {}
         weighted_host = least_cost.weighted_sum(fn_tuples, hostinfo_list,
                 options)
-        self.assertEqual(weighted_host.weight, 11536)
-        self.assertEqual(weighted_host.host_state.host, 'host1')
+        self.assertEqual(weighted_host.weight, 0)
+        self.assertEqual(weighted_host.host, 'host1')
 
     def test_weighted_sum_single_function(self):
         fn_tuples = [(1.0, offset), ]
@@ -83,9 +88,13 @@ class LeastCostTestCase(test.TestCase):
         # [offset, ]=
         # [10512, 11024, 13072, 18192]
 
+        # Normalized
+        # [offset, ]=
+        # [ 0.0, 0.06667, 0.33333, 1.0]
+
         # so, host1 should win:
         options = {}
         weighted_host = least_cost.weighted_sum(fn_tuples, hostinfo_list,
                                                                     options)
-        self.assertEqual(weighted_host.weight, 10512)
-        self.assertEqual(weighted_host.host_state.host, 'host1')
+        self.assertEqual(weighted_host.weight, 0)
+        self.assertEqual(weighted_host.host, 'host1')
