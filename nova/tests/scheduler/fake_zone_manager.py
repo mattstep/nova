@@ -57,16 +57,20 @@ class FakeZoneManager(zone_manager.ZoneManager):
 
     def _compute_node_get_all(self, context):
         return [
-            dict(local_gb=1024, memory_mb=1024, service=dict(host='host1')),
-            dict(local_gb=2048, memory_mb=2048, service=dict(host='host2')),
-            dict(local_gb=4096, memory_mb=4096, service=dict(host='host3')),
-            dict(local_gb=8192, memory_mb=8192, service=dict(host='host4')),
+            dict(vcpus=1, local_gb=1024, memory_mb=1024,
+                service=dict(host='host1')),
+            dict(vcpus=2, local_gb=2048, memory_mb=2048,
+                service=dict(host='host2')),
+            dict(vcpus=4, local_gb=4096, memory_mb=4096,
+                service=dict(host='host3')),
+            dict(vcpus=8, local_gb=8192, memory_mb=8192,
+                service=dict(host='host4')),
         ]
 
     def _instance_get_all(self, context):
         return [
-            dict(local_gb=512, memory_mb=512, host='host1'),
-            dict(local_gb=512, memory_mb=512, host='host1'),
-            dict(local_gb=512, memory_mb=512, host='host2'),
-            dict(local_gb=1024, memory_mb=1024, host='host3'),
+            dict(vcpus=1, local_gb=512, memory_mb=512, host='host1'),
+            dict(vcpus=1, local_gb=512, memory_mb=512, host='host1'),
+            dict(vcpus=1, local_gb=512, memory_mb=512, host='host2'),
+            dict(vcpus=2, local_gb=1024, memory_mb=1024, host='host3'),
         ]

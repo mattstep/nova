@@ -39,6 +39,8 @@ flags.DEFINE_integer('reserved_host_disk_mb', 0,
         'Amount of disk in MB to reserve for host/dom0')
 flags.DEFINE_integer('reserved_host_memory_mb', 512,
         'Amount of memory in MB to reserve for host/dom0')
+flags.DEFINE_integer('reserved_host_vcpus', 0,
+    'Amount of vcpus to reserve for host/dom0')
 
 
 class ZoneState(object):
@@ -152,7 +154,8 @@ class HostInfo(object):
     ad-hoc data structures previously used and lock down
     access."""
 
-    def __init__(self, host, caps=None, free_ram_mb=0, free_disk_gb=0):
+    def __init__(self, host, caps=None,
+                 free_ram_mb=0, free_disk_gb=0, free_vcpus=0):
         self.host = host
 
         # Read-only capability dicts
@@ -169,11 +172,13 @@ class HostInfo(object):
         # These will change as resources are virtually "consumed".
         self.free_ram_mb = free_ram_mb
         self.free_disk_gb = free_disk_gb
+        self.free_vcpus = free_vcpus
 
-    def consume_resources(self, disk_gb, ram_mb):
+    def consume_resources(self, disk_gb, ram_mb, vcpus=0):
         """Consume some of the mutable resources."""
         self.free_disk_gb -= disk_gb
         self.free_ram_mb -= ram_mb
+        self.free_vcpus -= vcpus
 
     def __repr__(self):
         return "%s ram:%s disk:%s" % \
@@ -231,6 +236,7 @@ class ZoneManager(object):
         for compute in compute_nodes:
             all_disk = compute['local_gb']
             all_ram = compute['memory_mb']
+            all_vcpus = compute['vcpus']
             service = compute['service']
             if not service:
                 logging.warn(_("No service for compute ID %s") % compute['id'])
@@ -239,10 +245,14 @@ class ZoneManager(object):
             host = service['host']
             caps = self.service_states.get(host, None)
             host_info = HostInfo(host, caps=caps,
-                    free_disk_gb=all_disk, free_ram_mb=all_ram)
+                    free_disk_gb=all_disk,
+                    free_ram_mb=all_ram,
+                    free_vcpus=all_vcpus)
             # Reserve resources for host/dom0
-            host_info.consume_resources(FLAGS.reserved_host_disk_mb * 1024,
-                    FLAGS.reserved_host_memory_mb)
+            host_info.consume_resources(
+                    FLAGS.reserved_host_disk_mb / 1024,
+                    FLAGS.reserved_host_memory_mb,
+                    FLAGS.reserved_host_vcpus)
             host_info_map[host] = host_info
 
         # "Consume" resources from the host the instance resides on.
@@ -256,7 +266,8 @@ class ZoneManager(object):
                 continue
             disk = instance['local_gb']
             ram = instance['memory_mb']
-            host_info.consume_resources(disk, ram)
+            vcpus = instance['vcpus']
+            host_info.consume_resources(disk, ram, vcpus)
 
         return host_info_map
 
