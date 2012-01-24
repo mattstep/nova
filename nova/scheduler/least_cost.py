@@ -85,6 +85,24 @@ def compute_fill_first_cost_fn(host_state, weighing_properties):
     return host_state.free_ram_mb
 
 
+def compute_even_fill_vcpus_cost_fn(host_info, options=None):
+    """Hosts with more free cpu have a lower weight, so try to
+    evenly distribute based on cpu availability."""
+    return -1 * (host_info.vcpus_total - host_info.vcpus_used)
+
+
+def compute_even_fill_ram_cost_fn(host_info, options=None):
+    """Hosts with more free ram have a lower weight, so try to
+    evenly distribute based on memory availability."""
+    return -1 * host_info.free_ram_mb
+
+
+def compute_even_fill_disk_cost_fn(host_info, options=None):
+    """Hosts with more free disk have a lower weight, so try to
+    evenly distribute based on disk availability."""
+    return -1 * host_info.free_disk_gb
+
+
 def weighted_sum(weighted_fns, host_states, weighing_properties):
     """Use the weighted-sum method to compute a score for an array of objects.
     Normalize the results of the objective-functions into [0,1] so that the
