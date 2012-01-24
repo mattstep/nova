@@ -41,6 +41,12 @@ flags.DEFINE_float('noop_cost_fn_weight', 1.0,
              'How much weight to give the noop cost function')
 flags.DEFINE_float('compute_fill_first_cost_fn_weight', 1.0,
              'How much weight to give the fill-first cost function')
+flags.DEFINE_float('compute_even_fill_vcpus_cost_fn_weight', 1.0,
+             'How much weight to give the even-fill by vcpus cost function')
+flags.DEFINE_float('compute_even_fill_ram_cost_fn_weight', 1.0,
+             'How much weight to give the even-fill by ram cost function')
+flags.DEFINE_float('compute_even_fill_disk_cost_fn_weight', 1.0,
+             'How much weight to give the even-fill by disk cost function')
 
 
 class WeightedHost(object):
@@ -77,6 +83,24 @@ def compute_fill_first_cost_fn(host_info, options=None):
     """More free ram = higher weight. So servers will less free
     ram will be preferred."""
     return host_info.free_ram_mb
+
+
+def compute_even_fill_vcpus_cost_fn(host_info, options=None):
+    """Hosts with more free cpu have a lower weight, so try to
+    evenly distribute based on cpu availability."""
+    return -1 * host_info.free_vcpus
+
+
+def compute_even_fill_ram_cost_fn(host_info, options=None):
+    """Hosts with more free ram have a lower weight, so try to
+    evenly distribute based on memory availability."""
+    return -1 * host_info.free_ram_mb
+
+
+def compute_even_fill_disk_cost_fn(host_info, options=None):
+    """Hosts with more free disk have a lower weight, so try to
+    evenly distribute based on disk availability."""
+    return -1 * host_info.free_disk_gb
 
 
 def weighted_sum(weighted_fns, host_list, options):
