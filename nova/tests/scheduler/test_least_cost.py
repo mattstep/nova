@@ -74,7 +74,7 @@ class LeastCostTestCase(test.TestCase):
         weighted_host = least_cost.weighted_sum(fn_tuples, hostinfo_list,
                 options)
         self.assertEqual(weighted_host.weight, 0)
-        self.assertEqual(weighted_host.host, 'host1')
+        self.assertEqual(weighted_host.host_state.host, 'host1')
 
     def test_weighted_sum_single_function(self):
         fn_tuples = [(1.0, offset), ]
@@ -97,7 +97,7 @@ class LeastCostTestCase(test.TestCase):
         weighted_host = least_cost.weighted_sum(fn_tuples, hostinfo_list,
                                                                     options)
         self.assertEqual(weighted_host.weight, 0)
-        self.assertEqual(weighted_host.host, 'host1')
+        self.assertEqual(weighted_host.host_state.host, 'host1')
 
     def test_weighted_sum_even_distribution_functions(self):
         fn_tuples = [
@@ -106,7 +106,7 @@ class LeastCostTestCase(test.TestCase):
             (1.0, least_cost.compute_even_fill_disk_cost_fn)
         ]
 
-        hostinfo_list = self.zone_manager.get_all_host_data(None).items()
+        hostinfo_list = self._get_all_hosts()
         options = {}
         weighted_host = least_cost.weighted_sum(fn_tuples, hostinfo_list,
             options)
@@ -114,4 +114,4 @@ class LeastCostTestCase(test.TestCase):
         # host4 is the least cost host, since it has the most available
         # resources.
         self.assertEqual(weighted_host.weight, 0)
-        self.assertEqual(weighted_host.host, 'host4')
+        self.assertEqual(weighted_host.host_state.host, 'host4')

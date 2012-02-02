@@ -100,7 +100,7 @@ def compute_even_fill_ram_cost_fn(host_info, options=None):
 def compute_even_fill_disk_cost_fn(host_info, options=None):
     """Hosts with more free disk have a lower weight, so try to
     evenly distribute based on disk availability."""
-    return -1 * host_info.free_disk_gb
+    return -1 * host_info.free_disk_mb
 
 
 def weighted_sum(weighted_fns, host_states, weighing_properties):
