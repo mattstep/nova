@@ -41,6 +41,15 @@ least_cost_opts = [
     cfg.FloatOpt('compute_fill_first_cost_fn_weight',
              default=1.0,
                help='How much weight to give the fill-first cost function'),
+    cfg.FloatOpt('compute_even_fill_vcpus_cost_fn_weight',
+                default=1.0,
+                help='How much weight to give the even-fill by vcpus cost function'),
+    cfg.FloatOpt('compute_even_fill_ram_cost_fn_weight',
+                default=1.0,
+                help='How much weight to give the even-fill by ram cost function'),
+    cfg.FloatOpt('compute_even_fill_disk_cost_fn_weight',
+                default=1.0,
+                help='How much weight to give the even-fill by disk cost function'),
     ]
 
 FLAGS = flags.FLAGS
